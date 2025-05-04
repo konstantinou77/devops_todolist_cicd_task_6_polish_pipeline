@@ -80,7 +80,7 @@ jobs:
       - name: Upload python artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: python-artifacts-${{ matrix.OsType }}-${{ matrix.PythonVersion }}
+          name: python-artifacts-${{ matrix.OsType }}-${{ matrix.PythonVersion }}-${{ github.run_id }}
           path: .
 
       - name: Upload helm artifacts
