@@ -8,13 +8,39 @@ on:
   pull_request:
     branches: ["main"]
 
+
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Environment to deploy to"
+        required: true
+        type: choice
+        options: ['development', 'staging']
+      os-type:
+        description: "Operating System"
+        required: true
+        type: choice
+        options: ['ubuntu-latest', 'windows-latest']
+      python-version:
+        description: "Python Version"
+        required: true
+        type: choice
+        options: ['3.8', '3.9']
+concurrency:
+  group: ${{ github.workflow }} - ${{ github.ref }}
+  cancel-in-progress: true
 env:
   PythonVersion: 3.8
   DockerImageName: todoapp
+  DockerImageRepo: konstant1nou77/todoapp
 
 jobs:
   python-ci:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        PythonVersion: [3.8, 3.9]
+        OsType: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.OsType }}
     defaults:
       run:
         working-directory: ./src
@@ -22,10 +48,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Python ${{ env.PythonVersion }}
+      - name: Set up Python ${{ matrix.PythonVersion }}
         uses: actions/setup-python@v4
         with:
-          python-version: ${{ env.PythonVersion }}
+          python-version: ${{ matrix.PythonVersion }}
+
 
       - name: Install dependencies
         run: |
@@ -53,7 +80,7 @@ jobs:
       - name: Upload python artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: python-artifacts
+          name: python-artifacts-${{ matrix.OsType }}-${{ matrix.PythonVersion }}
           path: .
 
       - name: Upload helm artifacts
@@ -80,7 +107,7 @@ jobs:
     - uses: actions/download-artifact@v4
       name: Download python artifacts
       with:
-        name: python-artifacts
+        name: python-artifacts-${{ inputs.os-type}}-${{ inputs.os-type }}
         path: .
 
     - name: Login to Docker Hub
