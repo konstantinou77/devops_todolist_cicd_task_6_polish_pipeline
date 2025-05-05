@@ -21,11 +21,22 @@ on:
         required: true
         type: choice
         options: ['ubuntu-latest', 'windows-latest']
+        default: 'ubuntu-latest'
       python-version:
         description: "Python Version"
         required: true
         type: choice
-        options: ['3.8', '3.9']
+        options: [3.8, 3.9]
+        default: '3.8'
+      artifact:
+        description: "Artifact to deploy"
+        required: true
+        type: choice
+        options:
+         - ubuntu-3.8
+         - ubuntu-3.9
+         - windows-3.8
+         - windows-3.9
 concurrency:
   group: ${{ github.workflow }} - ${{ github.ref }}
   cancel-in-progress: true
@@ -80,21 +91,21 @@ jobs:
       - name: Upload python artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: python-artifacts-${{ matrix.OsType }}-${{ matrix.PythonVersion }}-${{ github.run_id }}
+          name: python-artifacts-${{ matrix.OsType }}-${{ matrix.PythonVersion }}
           path: .
 
       - name: Upload helm artifacts
         if: github.ref_name == 'main'
         uses: actions/upload-artifact@v4
         with:
-          name: helm-artifacts
+          name: helm-artifacts-${{ matrix.OsType }}-${{ matrix.PythonVersion }}
           path: ${{ github.workspace }}/helm-charts
 
       - name: Upload kind cluster artifact
         if: github.ref_name == 'main'
         uses: actions/upload-artifact@v4
         with:
-          name: kind-cluster
+          name: kind-cluster-${{ matrix.OsType }}-${{ matrix.PythonVersion }}
           path: ${{ github.workspace }}/cluster.yml
 
   docker-ci:
@@ -107,7 +118,7 @@ jobs:
     - uses: actions/download-artifact@v4
       name: Download python artifacts
       with:
-        name: python-artifacts-${{ inputs.os-type}}-${{ inputs.os-type }}
+        name: python-artifacts-${{ inputs.artifact }}
         path: .
 
     - name: Login to Docker Hub
@@ -132,7 +143,7 @@ jobs:
 
     - uses: actions/download-artifact@v4
       with:
-        name: helm-artifacts
+        name: helm-artifacts-${{ github.event.inputs.artifact }}
         path: .
 
     - name: Set Up Helm
@@ -164,6 +175,7 @@ jobs:
 
   deploy-helm-stg:
     name: Deploy helm to Staging
+    if: ${{ github.event.inputs.environment == 'staging' }}
     uses: ./.github/workflows/reusable-deployment.yml
     needs: [deploy-helm-dev]
     secrets: inherit
