@@ -111,14 +111,14 @@ jobs:
   docker-ci:
     name: Build and Push Image
     runs-on: ubuntu-latest
-    if: ${{ github.ref_name == 'main' }}
+    if: github.event_name == 'workflow_dispatch' && github.ref_name == 'main'
     needs: python-ci
     steps:
 
     - uses: actions/download-artifact@v4
       name: Download python artifacts
       with:
-        name: python-artifacts-${{ inputs.artifact }}
+        name: python-artifacts-${{ github.event.inputs.artifact }}
         path: .
 
     - name: Login to Docker Hub
