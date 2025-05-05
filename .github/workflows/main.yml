@@ -20,8 +20,8 @@ on:
         description: "Operating System"
         required: true
         type: choice
-        options: ['ubuntu', 'windows']
-        default: 'ubuntu'
+        options: ['ubuntu-latest', 'windows-latest']
+        default: 'ubuntu-latest'
       python-version:
         description: "Python Version"
         required: true
@@ -91,21 +91,21 @@ jobs:
       - name: Upload python artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: python-artifacts-${{ matrix.OsType }}-${{ matrix.PythonVersion }}
+          name: python-artifacts-${{ github.event.inputs.artifact }}
           path: .
 
       - name: Upload helm artifacts
         if: github.ref_name == 'main'
         uses: actions/upload-artifact@v4
         with:
-          name: helm-artifacts-${{ matrix.OsType }}-${{ matrix.PythonVersion }}
+          name: helm-artifacts-${{ github.event.inputs.artifact }}
           path: ${{ github.workspace }}/helm-charts
 
       - name: Upload kind cluster artifact
         if: github.ref_name == 'main'
         uses: actions/upload-artifact@v4
         with:
-          name: kind-cluster-${{ matrix.OsType }}-${{ matrix.PythonVersion }}
+          name: kind-cluster-${{ github.event.inputs.artifact }}
           path: ${{ github.workspace }}/cluster.yml
 
   docker-ci:
@@ -143,7 +143,7 @@ jobs:
 
     - uses: actions/download-artifact@v4
       with:
-        name: helm-artifacts-${{ github.event.inputs.artifact }}
+        name: helm-artifacts-${{ matrix.OsType }}-${{ matrix.PythonVersion }}
         path: .
 
     - name: Set Up Helm
