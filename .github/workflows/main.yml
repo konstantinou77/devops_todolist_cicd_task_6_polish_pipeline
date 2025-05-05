@@ -20,8 +20,8 @@ on:
         description: "Operating System"
         required: true
         type: choice
-        options: ['ubuntu-latest', 'windows-latest']
-        default: 'ubuntu-latest'
+        options: ['ubuntu', 'windows']
+        default: 'ubuntu'
       python-version:
         description: "Python Version"
         required: true
@@ -50,7 +50,7 @@ jobs:
     strategy:
       matrix:
         PythonVersion: [3.8, 3.9]
-        OsType: [ubuntu-latest, windows-latest]
+        OsType: [ubuntu, windows]
     runs-on: ${{ matrix.OsType }}
     defaults:
       run:
