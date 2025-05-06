@@ -32,7 +32,7 @@ on:
         description: "Select an artifact to deploy"
         required: true
         type: choice
-        options: ['windows-3.8', 'windows-3.9', 'ubuntu-3.8', 'ubuntu-3.9']
+        options: ['3.8-windows-latest', '3.9-windows-latest', '3.8-ubuntu-latest', '3.9-ubuntu-latest']
 
 concurrency:
   group: ${{ github.workflow }} - ${{ github.ref }}
