@@ -36,7 +36,7 @@ jobs:
 
       - uses: actions/download-artifact@v4
         with:
-          name: kind-cluster
+          name: ${{ github.event.inputs.artifacts }}
           path: .
 
       - name: Set Up Helm
