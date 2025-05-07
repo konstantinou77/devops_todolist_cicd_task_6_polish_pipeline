@@ -170,7 +170,7 @@ jobs:
       environment: development
       version: ${{ github.sha }}
 
-      
+
   deploy-helm-stg:
     name: Deploy helm to Staging
     if: ${{ github.event.inputs.environment == 'staging' }}
@@ -182,3 +182,5 @@ jobs:
       version: ${{ github.sha }}
       helm-values-path: ./todoapp/values/stg.yaml
       helm-release-name: todoapp-staging
+
+      
